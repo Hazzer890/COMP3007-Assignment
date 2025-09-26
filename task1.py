@@ -4,21 +4,21 @@ from ultralytics import YOLO
 from PIL import Image
 
 # -------- config --------
-INPUT_DIR = "/home/20607591/COMP3007-Assignment/inputImages"     # e.g. "/home/20607591/COMP3007-Assignment/input"
-OUTPUT_DIR = "/home/20607591/COMP3007-Assignment/outputImages"   # e.g. "/home/20607591/COMP3007-Assignment/output"
-MODEL_PATH = "/home/20607591/COMP3007-Assignment/myModel/building_numbers/weights/best.pt"
+INPUT_DIR = "inputImages"
+OUTPUT_DIR = "outputImages"
+MODEL_PATH = "myModel/building_numbers/weights/best.pt"
 # ------------------------
 
-def ensure_dir(d):
-    if not os.path.exists(d):
-        print(f"Creating directory: {d}")
-        os.makedirs(d)
+def ensure_dir(dir):
+    if not os.path.exists(dir):
+        print(f"Creating directory: {dir}")
+        os.makedirs(dir)
 
 def get_index(filename):
     # matches img<number>.jpg
-    m = re.match(r"im(\d+)\.jpg$", filename)
-    print(f"Extracted index: {m.group(1)}" if m else "No match found")
-    return m.group(1) if m else None
+    match = re.match(r"im(\d+)\.jpg$", filename)
+    print(f"Extracted index: {match.group(1)}" if match else "No match found")
+    return match.group(1) if match else None
 
 def main():
     ensure_dir(OUTPUT_DIR)
@@ -36,9 +36,14 @@ def main():
 
         # We expect exactly one detection
         boxes = results[0].boxes
-        if len(boxes) != 1:
-            # no output if zero or multiple
+        # skip if no detections
+        if len(boxes) == 0:
             continue
+        # if multiple detections, keep only the most confident one
+        if len(boxes) > 1:
+            confidences = boxes.conf  # Tensor of confidence scores
+            max_idx = int(confidences.argmax())
+            boxes = boxes[max_idx : max_idx + 1]
 
         # load full image
         img = Image.open(img_path).convert("RGB")
