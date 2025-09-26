@@ -1,0 +1,564 @@
+Computing @ Curtin University
+
+Machine Perception
+COMP3007
+
+ASSIGNMENT
+
+Due Date: Week 11 - Friday 3-October-2025 at 17:00.
+Weight: 40% of the unit mark.
+Note: This document is subject to minor corrections and updates. Announcements will
+be made promptly on Blackboard and during lectures. Always check for the latest version of
+the assignment. Failure to do so may result in you not completing the tasks according to the
+specifications.
+
+1
+
+Overview
+
+The purpose of this assignment is to gain practical experience in developing a machine perception
+application. You will integrate the theoretical concepts covered in lectures with independent research
+into a specific machine perception problem. Your task is to apply the skills acquired through practical
+exercises to design and implement the core components of a computer visionbased building number
+recognition system. This assignment not only requires strong technical proficiency in programming,
+but also aims to enhance your communication skills, as you will be expected to clearly explain your
+approach, methodology, and findings.
+
+2
+
+Background
+
+In this assignment, you will develop a machine perception program to detect and recognise building
+numbers on the Curtin Bentley campus. This can be considered a vision-based perception module for
+a smart navigation system. All Curtin buildings in Bentley are numbered, with each number usually
+displayed clearly on the building exterior. Within the scope of this assignment, there are three main
+types of building number displays:
+• Type I Small white numbers on a black rectangular plate affixed to the building.
+• Type II Large white numbers mounted directly onto the building wall (concrete or brick), visible
+from a considerable distance.
+• Type III Displays that differ significantly from the above two types.
+The test set consists of five (5) images: two (2) of Type I, one (1) of Type II, one (1) of Type III,
+and one (1) negative image (i.e., containing no valid building numbers). Examples of these images
+are provided below.
+Updated
+August 12, 2025
+
+Machine Perception COMP3007
+ASSIGNMENT- Semester 2, 2025
+
+Page
+1/11
+
+Computing @ Curtin University
+
+(a) Building Number Type I
+
+(b) Building Number Type II
+
+(c) Building Number Type III
+
+(d) A negative example
+
+Figure 1: Examples of different types of building number and negative images in this assignment
+A validation set, which will be made available on Blackboard, will give you an idea of what the
+actual test images may look like.
+You may make use of the fact that a valid building number typically consist of digits and, in rare
+cases, a trailing alphabet letter (e.g. A, B, C, D). The number of possibiilites is current as of 2025.
+Please refer to the campus online map
+https://properties.curtin.edu.au/campus-maps/
+Also note that there are various directive signs on campus that may point to different buildings;
+however, the numbers on these signs are not considered valid building numbers. A valid building
+number must be physically affixed to the building itself.
+A typical machine perception program would involve at least the following steps:
+• Reading the input image;
+• Performing necessary image processing operations;
+• Detecting and localising the building number, if present;
+• Segmenting the building number into individual characters;
+
+Updated
+August 12, 2025
+
+Machine Perception COMP3007
+ASSIGNMENT- Semester 2, 2025
+
+Page
+2/11
+
+Computing @ Curtin University
+
+• Recognising individual characters; and
+• Optionally, post-processing the detection results.
+Note that, in some implementations, a feedback loop may be necessary to improve detection
+performance. You are encouraged to consider such an approach, as there may be many instances of
+text in an image that closely resemble building numbers.
+You are required to implement an appropriate machine perception pipeline to perform the above
+steps by developing Python programs. Your implementation will be primarily evaluated based on the
+following tasks:
+• Task 1: Building number detection and localisation;
+• Task 2: Character extraction;
+• Task 3: Character recognition;
+• Task 4: Complete pipeline integration.
+You are expected to apply the theory discussed in lectures and the skills acquired through practical
+exercises to complete these tasks. In addition, you will conduct independent research to explore
+various approaches for solving each task and make informed decisions regarding your implementation,
+including innovative solutions tailored to the specific requirements of this assignment.
+Each individual task, as well as the complete pipeline, will be assessed, with marks allocated
+accordingly. Details of the mark distribution are provided in subsequent sections.
+NOTE: While advanced models capable of handling the complete pipeline may be available online,
+this assignment requires you to use standard tools to build the pipeline yourself. There are restrictions
+on the libraries and models you may use in this assignment. Visit the assignment page on Blackboard
+for the complete list of approved libraries and models. This list may be updated regularly based on
+feedback and student requests.
+
+3
+
+The Tasks
+
+3.1
+
+Task 1: Building Number Detection and Localisation
+
+Develop a Python program that reads colour images img1.jpg, img2.jpg, etc., from a designated
+input directory. For each image, the program should determine whether a valid building number is
+present and, if so, extract the region containing that number. Some test images may be negative,
+meaning they do not contain a valid building number. Your program will be considered functional if it
+meets the following requirements:
+• For a negative input image, the program must not produce any output image.
+• For a positive input image, the program must extract the detection region and save it as a PNG
+file with a filename matching the input image index but prefixed with bn. For example, if the input
+image is img1.jpg, the corresponding output must be bn1.png. If the input image is img3.jpg
+and it is negative, then no bn3.png file should be produced. The output images must be saved
+in the output directory as specified in Section 4.3.
+• Each positive test image contains only one building number. The program must not output more
+than one detected region. Extracting multiple regions will be considered a failed detection.
+See Fig. 2 for an example of a positive input image and the corresponding required output.
+Updated
+August 12, 2025
+
+Machine Perception COMP3007
+ASSIGNMENT- Semester 2, 2025
+
+Page
+3/11
+
+Computing @ Curtin University
+
+(a) Input: Image imgX.jpg
+
+(b) Detected Area
+
+(c) Output: Extracted building number as PNG image bnX.png
+
+Figure 2: Task 1
+
+3.2
+
+Task 2: Character extraction from building numbers
+
+For this task, you are provided with images of detected regions containing building numbers, as
+identified in Task 1. Write a Python program to extract each individual character as a separate PNG
+file named sequentially (c01.png, c02.png, c03.png, etc.). A character is considered successfully
+segmented if:
+1. The segmented area contains the complete and correct character.
+2. The segmented area does not include any part of other characters in the building number.
+
+(a) Input: Detected area as PNG image bnX.png
+
+(b) Output: Segmented indvidual characters as PNG images c1.png, c2.png, c3.png, . . . . under the folder
+bnX
+
+Figure 3: Task 2
+
+Updated
+August 12, 2025
+
+Machine Perception COMP3007
+ASSIGNMENT- Semester 2, 2025
+
+Page
+4/11
+
+Computing @ Curtin University
+
+3.3
+
+Task 3: Building number recognition
+
+In this task, you are given sets of segmented individual characters obtained from Task 2. Each set
+corresponds to a building number. You must design and implement your own classification model,
+train it yourself, and write a Python program that reads each input character image and outputs the
+recognised character to a text file (see the example figure).
+
+(a) Input: Individual characters as PNG images c1.png, c2.png, c3.png, . . . .
+
+2
+
+0
+
+4
+
+c1.txt
+
+c2.txt
+
+c3.txt
+
+(b) Output: Text files c1.txt, c2.txt, c3.txt, . . . showing the character prediction
+
+Figure 4: Task 3
+NOTE: You are not allowed to use any pre-made OCR models (e.g., Tesseract OCR, Paddle OCR,
+etc.) as this is not a reflection of true learning. This task expects you to go through the full process of
+designing, implementing, and training the model yourself.
+
+3.4
+
+Task 4: Complete Perception Pipeline
+
+In this task, you will complete the perception pipeline by integrating the individual programs developed
+in the previous tasks. For each input image:
+• If the image is negative, the program must produce no output.
+• If the image is positive, the program must output a single text file containing the recognised
+building number. The text file must have the same base filename as the input image, e.g.,
+img1.txt, img2.txt, etc.
+
+4
+
+Specifications
+
+4.1
+
+Environment
+
+• Programming language: Python. Your programs must be compatible with Python 3.10.12.
+• Allowed libraries: Please refer to the assignment page on Blackboard for the most up-to-date
+list.
+• Validation set: A separate validation set, simulating the test images, is provided on Blackboard.
+This set is intended to help you estimate the performance of your program. You must test your
+programs on this validation set and include the results in your report.
+• Framework: You must implement your programs using the assignment Python framework
+provided for this task. This framework contains skeleton code and predefined structures to
+facilitate consistent marking of your implementation. Details are available on Blackboard.
+Updated
+August 12, 2025
+
+Machine Perception COMP3007
+ASSIGNMENT- Semester 2, 2025
+
+Page
+5/11
+
+Computing @ Curtin University
+
+204
+imgX.txt
+
+(a) Input: Image imgX.jpg
+
+(b) Output: Text file imgX.txt showing the building number.
+
+Figure 5: Task 4
+
+4.2
+
+Pass Requirements
+
+To be eligible for any marks, your implementation must demonstrate performance above that of
+random guessing. Specifically:
+• Task 1: Correctly detect and localise at least one positive image.
+• Task 2: Correctly segment at least six (6) characters across all given building numbers.
+• Task 3: Correctly recognise at least 50% of the total characters across all given building
+numbers.
+• Task 4: Achieve perfect recognition for at least one positive image.
+4.2.1
+
+Reasonable Performance
+
+Your electronic submission must include the source code, trained models, and executable programs
+developed for the tasks. Each program should clearly indicate normal operation by outputting selected
+verbose messages to the terminal.
+The final programs must not produce any interactive plots and must not require user input during
+execution.
+For each task, if your program fails to produce any results within 5 minutes when executed on a
+laboratory computer in Room 232 (regardless of whether the eventual results are correct), it will be
+deemed to have failed, and you will receive no marks for that task.
+
+4.3
+
+Programs, Directories, and Files
+
+Please follow the following convention for files and directories of your submission:
+4.3.1
+
+Your electronic submission of the Python implementation
+
+• You must submit a single compressed .zip file to Blackboard, named according to the following
+convention:
+Updated
+August 12, 2025
+
+Machine Perception COMP3007
+ASSIGNMENT- Semester 2, 2025
+
+Page
+6/11
+
+Computing @ Curtin University
+
+[lastname] [firstname] [student ID].zip
+For example, if your name is Donald Trump and your student ID is 12345678, the filename
+should be:
+trump donald 12345678.zip
+Please remove all spaces, dashes, and any non-alphabetic characters from your first name and
+last name when creating the zip file.
+• Your submission should contain only:
+– Source code.
+– Essential model files required to run your programs (e.g., trained weights, configuration
+files).
+• To save space, your submission must not include temporary, intermediate, or unnecessary files.
+Do not include any training data used to build your models that is not essential for running your
+programs on the test images. The total size of the compressed .zip file must not exceed 50 MB.
+4.3.2
+
+Input
+
+Important: All test images are placed in a dedicated directory on a Linux machine, which I will refer
+to as $TEST DIR. The marking script will automatically pass the path to this directory to your Python
+program. Under this directory, the images are structured as follows
+• Task 1: there are five JPEG image files img1.jpg,. . . , img5.jpg under
+$TEST DIR/task1
+• Task 2: there are four (4) PNG image files bn1.png, . . . , bn4.png under
+$TEST DIR/task2
+• Task 3: there are four sub-directories, each corresponding to the number plate in Task 2
+$TEST DIR/task3/bn1
+$TEST DIR/task3/bn2
+$TEST DIR/task3/bn3
+$TEST DIR/task3/bn4
+In each sub-directory, there are 3 (or 4) PNG image files c1.png, c2.png, c3.png ..., each
+corresponds
+• Task 4: the input images are the same as those found in Task 1.
+4.3.3
+
+Output
+
+Important: The output files produced by your programs should be placed under the output in
+a directory which I refer to as $SUBMISSION DIR/output/, where $SUBMISSION DIR is where your
+submission is unpacked to.
+Specifically, the output files for each task should be produces as follows:
+
+Updated
+August 12, 2025
+
+Machine Perception COMP3007
+ASSIGNMENT- Semester 2, 2025
+
+Page
+7/11
+
+Computing @ Curtin University
+
+• Task 1: All output files should be written to $SUBMISSION DIR/output/task1. For every positive
+input image imgX.jpg your program must produce an image file bnX.png that shows only the
+detected area containing the building number. For the negative input image, your program
+should produce nothing.
+• Task 2: the image files for individual 3 (or 4) segmented characters must be named c1.png,c2.png,
+c3.png,. . . following the exact order how they appear in the building number, and for input image
+bnX.png, they must be located under
+$SUBMISSION DIR/output/task2/bnX/
+• Task 3: your program must output a text file cX.txt for every individual input character image
+file cX.png and for every building number under
+$SUBMISSION DIR/output/task3/bnX/
+Each text file must contain only the recognised character.
+• Task 4: it must produce a text file imgX.txt for every positive input image imgX.jpg and place it
+under
+$SUBMISSION DIR/output/task4/
+Each text file must contain all characters in the exact order how they appear in the building
+number. Your program must produce nothing if it is a negative input image.
+
+4.4
+
+Your Report
+
+A written report must also be submitted to Blackboard via the separate Turnitin submission link.
+The report must be in PDF format and follow the naming convention:
+[lastname] [firstname] [studentID].pdf
+For example, if your name is Donald Trump and your student ID is 12345678, your report file
+should be named:
+trump donald 12345678.pdf
+The report must include the following sections:
+1. Assignment Cover Sheet A completed Curtin University assignment cover sheet.
+2. Introduction A brief overview of the problem, objectives of the assignment, and the scope of
+your solution.
+3. Attempt and Environment Statement
+• A statement of how much of the assignment you have attempted.
+• Confirmation that you have tested your programs in the specified conda environment
+(provided on Blackboard) and using the prescribed assignment framework.
+4. Generative AI Declaration (if applicable) Clearly state any use of Generative AI in the development of your code, report, or other deliverables. Include:
+• The tool(s) used.
+Updated
+August 12, 2025
+
+Machine Perception COMP3007
+ASSIGNMENT- Semester 2, 2025
+
+Page
+8/11
+
+Computing @ Curtin University
+
+• The purpose for which they were used.
+• How the output was modified and integrated into your own work.
+If Generative AI was not used, explicitly state: ‘‘No Generative AI was used in the preparation of
+this assignment.’’
+5. Methodology and Implementation For each task (Task 1 to Task 4), clearly describe:
+• Your approach and rationale.
+• Features you extract.
+• Methods used for detection, segmentation, and recognition.
+• Any design decisions and innovative solutions.
+6. Results and Performance Evaluation
+• Present the performance of your program on the validation set for each task.
+• Include relevant metrics, tables, and qualitative observations.
+• Provide supporting diagrams, figures, or images that help explain your results.
+7. Discussion
+• Discuss strengths and limitations of your approach.
+• Suggest possible improvements or extensions.
+8. References A complete list of all references your implementation is based on or inspired by,
+following a consistent citation style.
+
+4.5
+
+Your demonstration
+
+A demonstration session will be conducted during a practical to verify your submission. You will be
+asked questions about your programs. The purpose of this demonstration is to make sure that your
+submission is your own work and you know exactly what you are doing.
+
+5
+
+Mark Allocation
+
+The total mark for this assignment is 100, distributed as follows.
+
+5.1
+
+Satisfactory Submission: 25 Marks
+
+A maximum of 25 marks may be awarded for the following:
+• Your submission meets the deadline and follows the instructions.
+• Your source code is well structured and fully commented, demonstrating good programming
+practice.
+• All developed programs meet the ‘‘Reasonable Performance’’ criteria.
+• A complete report outlining your design, implementation, and program performance on the
+validation set.
+Your actual marks will be determined in part subjectively by the marker based on inspection of your
+programs, code, report, and interview.
+Updated
+August 12, 2025
+
+Machine Perception COMP3007
+ASSIGNMENT- Semester 2, 2025
+
+Page
+9/11
+
+Computing @ Curtin University
+
+5.2
+
+Task 1: 20 Marks
+
+• Zero marks if your program does not meet the minimum pass requirements for Task 1.
+• 12 marks if your program meets the minimum pass requirements, with up to 8 additional marks
+for correctly detecting and localising extra building numbers and correctly identifying negative
+images (i.e., producing no output file for them).
+
+5.3
+
+Task 2: 20 Marks
+
+• Zero marks if your program does not meet the minimum pass requirements for Task 2.
+• 12 marks if your program meets the minimum pass requirements, with up to 8 additional marks
+for correctly extracting extra characters.
+
+5.4
+
+Task 3: 20 Marks
+
+• Zero marks if your program does not meet the minimum pass requirements for Task 3.
+• 12 marks if your program meets the minimum pass requirements, with up to 8 additional marks
+for correctly recognising extra characters.
+
+5.5
+
+Task 4: 15 Marks
+
+• Zero marks if your program does not meet the minimum pass requirements for Task 4.
+• 5 marks if your program meets the minimum pass requirements, with up to 10 additional marks
+for correctly recognising extra building numbers and correctly identifying negative images.
+NOTE: You must achieve at least 40 marks in this assignment (hurdle requirement) to pass the
+unit, regardless of your performance in the tests or final exam.
+
+6
+
+Submission
+
+You are required to submit your assignment by Week 11 - Friday 3-October-2025 at 17:00.
+There are two (2) separate submission links for this assignment on Blackboard:
+• Regular assignment submission link: for submitting your Python code and all other required
+files necessary to run your programs. This must be uploaded as a single compressed .zip file
+(no more than 50 MB).
+• Turnitin submission link: for submitting your written report in PDF format.
+You are responsible for ensuring that each submission is complete, correct, and not corrupted. Multiple
+submissions are allowed; however, only your most recent submission for each link will be marked.
+You must be available for a demonstration session. This is currently scheduled during the practical
+session you registered for in the final teaching week.
+The late submission policy (see the Unit Outline) will be strictly enforced.
+
+Updated
+August 12, 2025
+
+Machine Perception COMP3007
+ASSIGNMENT- Semester 2, 2025
+
+Page
+10/11
+
+Computing @ Curtin University
+
+7
+
+Academic Misconduct Plagiarism and Collusion
+
+Please note the following:
+
+Copying material (from other students, websites or other sources) and presenting it as your own
+work is plagiarism. Even with your own (possibly extensive) modifications,it is still plagiarism.
+Exchanging assignment solutions, or parts thereof, with other students is collusion. Engaging in
+such activities may lead to a grade of ANN (Result Annulled Due to Academic Misconduct) being
+awarded for the unit, or other penalties. Serious or repeated offences may result in termination or
+expulsion.
+You are expected to understand this at all times, across all your university studies, with or without
+warnings like this.
+
+Generative AI Policy
+Using Generative AI as a learning aid is acceptable; however, all work you submit must be entirely
+your own, and you must fully understand the code and content you provide. Any use of Generative AI
+must be explicitly declared in your report. If you are unsure whether your intended use is acceptable,
+you must seek written approval from the Unit Coordinator before proceeding.
+You may be required to attend an interview to demonstrate your understanding of your submission.
+If you cannot explain your work or show that you understand it, you may receive a mark of zero for the
+submission. This may also result in failing the assignment and, consequently, the unit.
+The bottom line: you must be able to clearly and confidently explain all aspects of the work you
+submit.
+
+END OF ASSIGNMENT
+
+Updated
+August 12, 2025
+
+Machine Perception COMP3007
+ASSIGNMENT- Semester 2, 2025
+
+Page
+11/11
+
+

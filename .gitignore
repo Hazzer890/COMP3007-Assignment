@@ -1,3 +1,10 @@
+# self selected
+Anaconda3-*.sh
+yolo*.pt
+wandb/
+mp-assignment-12
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
